@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha Lista de Vídeos</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+}
+
+header {
+    background: #ff0000;
+    padding: 20px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #ff0000;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #cc0000;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.video-card {
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.video-card iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    background: #222;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<header>🎬 Minha Lista de Vídeos do YouTube</header>
+
+<div class="container">
+
+    <div class="input-area">
+        <input type="text" id="videoUrl" placeholder="Cole o link do YouTube aqui">
+        <button onclick="addVideo()">Adicionar</button>
+    </div>
+
+    <div class="video-grid" id="videoGrid"></div>
+
+</div>
+
+<footer>© 2026 - Meu Site de Vídeos</footer>
+
+<script>
+let videos = JSON.parse(localStorage.getItem("videos")) || [];
+
+function extractVideoID(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function saveVideos() {
+    localStorage.setItem("videos", JSON.stringify(videos));
+}
+
+function renderVideos() {
+    const grid = document.getElementById("videoGrid");
+    grid.innerHTML = "";
+    videos.forEach((id, index) => {
+        grid.innerHTML += `
+            <div class="video-card">
+                <button class="remove-btn" onclick="removeVideo(${index})">×</button>
+                <iframe src="https://www.youtube.com/embed/${id}" 
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            </div>
+        `;
+    });
+}
+
+function addVideo() {
+    const url = document.getElementById("videoUrl").value;
+    const videoID = extractVideoID(url);
+
+    if(videoID) {
+        videos.push(videoID);
+        saveVideos();
+        renderVideos();
+        document.getElementById("videoUrl").value = "";
+    } else {
+        alert("Link inválido!");
+    }
+}
+
+function removeVideo(index) {
+    videos.splice(index, 1);
+    saveVideos();
+    renderVideos();
+}
+
+renderVideos();
+</script>
+
+</body>
+</html>
